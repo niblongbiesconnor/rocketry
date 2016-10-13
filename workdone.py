@@ -20,10 +20,10 @@ class WDCalc:
         self.filling_fraction_list=[]
         # Function of all times
         self.workdone_list=[]
-        # Pressure of air in bottle
-        self.P=4*(10**5)
+        # Pressure of air in bottle at the moment about 20 atmospheres
+        self.P=2.1*(10**6)
         # Volume of bottle (litres)
-        self.V=2*(10**-3) 
+        self.V=2*(10**-6) 
         # Density of liquid
         # Currently water
         self.rho=1
@@ -34,9 +34,8 @@ class WDCalc:
         """
         Calculates work done for various values of f
         """
-        # *10**-3 so as to convert units from litres to cubic metres
-        top = self.P * self.V * (10**-3)
-        bottom = (-self.gamma+1) * ((1-f)**self.gamma)-(1-f)
+        top = self.P * self.V*(((1-f)**self.gamma)-(1-f))
+        bottom = (-self.gamma+1)
         workdone = top / bottom
         return workdone 
     
@@ -59,7 +58,7 @@ class WDCalc:
             x = self.workdone(f) 
             self.filling_fraction_list.append(f) 
             self.workdone_list.append(x) 
-            return self.filling_fraction_list, self.workdone_list
+        return self.filling_fraction_list, self.workdone_list
     
     def findtotalWDMR(self):
         """
@@ -71,7 +70,7 @@ class WDCalc:
             x = self.WDweightratio(f) 
             self.filling_fraction_list.append(f) 
             self.workdone_list.append(x) 
-            return self.filling_fraction_list, self.workdone_list
+        return self.filling_fraction_list, self.workdone_list
     
     def graph_WDMR_FF(self):
         x,y=self.findtotalWDMR()
@@ -88,8 +87,7 @@ class WDCalc:
         plt.xlabel("Filling Fraction")
         plt.title("Work Done Against Filling Fraction")
         plt.show()
-        
 
-        
+
 
 calc=WDCalc()
