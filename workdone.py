@@ -28,7 +28,7 @@ class WDCalc:
         # Currently water
         self.rho=1
         #The total mass of the rocket when empty
-        self.mass_rocket=1
+        self.mass_rocket=10
         
     def workdone(self, f):
         """
@@ -44,7 +44,10 @@ class WDCalc:
         Calculate the work done per kilogram of mass
         """
         workdone = self.workdone(f)
-        mass = (f * self.V * (10**-3) * self.rho) + self.mass_rocket
+        #V*10**6 as converting back into litres from cubic metres as defined 
+        mass = (f * self.V*(10**6)*self.rho) + self.mass_rocket
+        print mass
+        
         WMR = workdone / mass
         return WMR
     
