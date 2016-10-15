@@ -20,15 +20,28 @@ class WDCalc:
         self.filling_fraction_list=[]
         # Function of all times
         self.workdone_list=[]
-        # Pressure of air in bottle at the moment about 20 atmospheres
-        self.P=2.1*(10**6)
+        # Pressure of air in bottle at the moment about 3 atmospheres
+        self.P=4*(10**5)
+        # Pressure of the atmosphere currently at an altitude of 0m above sea level
+        self.Patm=101325
         # Volume of bottle (litres)
-        self.V=2*(10**-6) 
+        self.V=2*(10**-3) 
         # Density of liquid
         # Currently water
         self.rho=1
         #The total mass of the rocket when empty
         self.mass_rocket=10
+    def WDgasblast(self,f):
+        """
+        calculates the work done in the gas blast
+        """
+        #10**3 to convert units
+        part1=(self.P*self.V)/(-self.gamma+1)
+        part2=(1-f)**(-self.gamma+1)
+        part3=(self.P/self.Patm)**((1/self.gamma)-1)
+        part4=(part2*part3)-1
+        workdone=part1*part4
+        return workdone
         
     def workdone(self, f):
         """
@@ -37,17 +50,16 @@ class WDCalc:
         top = self.P * self.V*(((1-f)**self.gamma)-(1-f))
         bottom = (-self.gamma+1)
         workdone = top / bottom
-        return workdone 
+        workdone+=(self.WDgasblast(f))
+        return workdone
     
     def WDweightratio(self,f):
         """
         Calculate the work done per kilogram of mass
         """
         workdone = self.workdone(f)
-        #V*10**6 as converting back into litres from cubic metres as defined 
-        mass = (f * self.V*(10**6)*self.rho) + self.mass_rocket
-        print mass
-        
+        #V*10**3 as converting back into litres from cubic metres as defined 
+        mass = (f * self.V*(10**3)*self.rho) + self.mass_rocket
         WMR = workdone / mass
         return WMR
     
