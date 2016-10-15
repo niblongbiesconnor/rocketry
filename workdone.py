@@ -31,6 +31,7 @@ class WDCalc:
         self.rho=1
         #The total mass of the rocket when empty
         self.mass_rocket=10
+        
     def WDgasblast(self,f):
         """
         calculates the work done in the gas blast
