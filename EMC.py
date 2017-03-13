@@ -62,28 +62,37 @@ class rocket():
         self.acceleration = self.initial_a()
         self.height=0
     
-    def initial_a(self):
-        acceleration=-water.density*water.height*Area(0)/self.mass                                    
-        acceleration+=B(water.initial_height)/water.initial_height
-        acceleration=acceleration*(water.pressure*Area(0)/self.mass)
-        acceleration-=9.81
-        return acceleration
+    def tube_update():
+        part1=2*water.initial_pressure*water.initial_volume/(mass*(1-gamma)
+        part2=(self.height*Area(rhino.tube_radius)/water.initial_volume+1)**(1-gamma)-1
+        part3=2*self.height*(Area(rhino.tube_radius))/
+        self.velocity=sqrt(part1*part2-part3)
     
-    def update(self):     
-        rhino.mass=rhino.mbottle+water.volume*water.density
-        self.acceleration=water.velocity*log(self.initial_mass/(self.mbottle)*delta)
-        self.velocity+=self.acceleration*delta
-        self.height+=self.velocity*delta
+    def water_update():
+    
+        def initial_a(self):
+            acceleration=-water.density*water.height*Area(0)/self.mass                                    
+            acceleration+=B(water.initial_height)/water.initial_height
+            acceleration=acceleration*(water.pressure*Area(0)/self.mass)
+            print (acceleration)
+            acceleration-=9.81
+            return acceleration
         
-        if self.height <= 0:
-            self.height = 0
-            self.velocity = 0
-            self.acceleration = 0
-        acc.append(self.acceleration)
-        vel.append(self.velocity)
-        pos.append(self.height)
-        tt.append(delta*rec)
-        
+        def update(self):     
+            rhino.mass=rhino.mbottle+water.volume*water.density
+            self.acceleration=water.velocity*log(self.initial_mass/(self.mbottle)*delta)
+            self.velocity+=self.acceleration*delta
+            self.height+=self.velocity*delta
+            
+            if self.height <= 0:
+                self.height = 0
+                self.velocity = 0
+                self.acceleration = 0
+            acc.append(self.acceleration)
+            vel.append(self.velocity)
+            pos.append(self.height)
+            tt.append(delta*rec)
+
 
 
 
@@ -104,7 +113,19 @@ class liquid:
        self.volume = Volume(self.height)
        self.initial_volume = self.volume
     
-    def velocity_update(self):
+    
+        
+    def tube_update(self):
+        self.velocity = self.velocity_update()
+        self.acceleration = self.velocity*delta
+        volume_lost = self.velocity*Area(0)*delta
+        self.volume -= volume_lost
+        self.flowrate = volume_lost*self.density/delta
+        rhino.mass -= volume_lost*self.density
+        
+    def water_update(self):
+        
+        def velocity_update(self):
         """
         updates the velocity according to the equations 
         """
@@ -117,19 +138,16 @@ class liquid:
         velocity=sqrt(abs((E+F)/(G+I)))
         liq_vel.append(velocity)
         return velocity
-    
-    def pressure_update(self):
-        part1 = rhino.volume - water.initial_volume
-        part2 = rhino.volume - water.volume
-        pressure = part1 / part2
-        pressure = pressure**gamma
-        pressure = pressure * water.initial_pressure
-        return pressure
-    
-    def update(self):
-        """
-        updates the liquid variables using the finite differences method
-        """
+        
+        def pressure_update(self):
+            part1 = rhino.volume - water.initial_volume
+            part2 = rhino.volume - water.volume
+            pressure = part1 / part2
+            pressure = pressure**gamma
+            pressure = pressure * water.initial_pressure
+            
+            return pressure
+            
         self.velocity = self.velocity_update()
         self.acceleration = self.velocity*delta
         volume_lost = self.velocity*Area(0)*delta
@@ -138,24 +156,59 @@ class liquid:
         rhino.mass -= volume_lost*self.density
         self.height -= delta*self.velocity*Area(0)/Area(self.height)
         self.pressure = self.pressure_update()
-        
         liq_H.append(self.height)
+            
+    def air_update(self):
+        return self.acceleration
+    
+    def space_fall(self):
+        return self.accelereation
+    
+    def atmosphere_fall(self):
+        return self.acceleration
         
+def tube()
+    while height<tube.height:
+            water.tube_update
+            rhino.update()
+            
+def water_blast(self):
+    while water.height>0:
+        water.water_update()
+        rhino.update()
+    return self.acceleration
+
+def air_blast(self):
+    while water.air_density>0:
+        water.air_update>0
+    return self.acceleration
+
+def space_fall(self):
+    return self.accelereation
+
+def atmosphere_fall(self):
+    return self.acceleration
+
+
+
+    
 
 
 water=liquid()
 rhino=rocket()
 
-while (rec < 5000):
+while (rec < 10):
     rec+=1
-    rhino.update()
+    
     if water.volume >= 0:
         water.update()
     else:
         liq_vel.append(0)
         liq_H.append(0)
+        rhino.update()
         break
-
+    rhino.update()
+    
 def plotting():
     plt.subplot(9,1,1)
     plt.plot(tt,acc)
