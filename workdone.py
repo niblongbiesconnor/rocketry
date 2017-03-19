@@ -3,107 +3,190 @@
 """
 Calculates the rocket's total work done
 """
-
+from math import pi 
 import matplotlib.pyplot as plt
+import numpy as np
+from mpl_toolkits.mplot3d.axes3d import Axes3D
+delta = 0.1
+gamma=1.4
 
-class WDCalc:
-    """
-    Class to calculate total work done for a specific rocket
-    """
-    def __init__(self):
-        """
-        Set local variables
-        """
-        # Ratio of specific heat transfer
-        self.gamma=1.4
-        # List of all times
-        self.filling_fraction_list=[]
-        # Function of all times
-        self.workdone_list=[]
-        # Pressure of air in bottle at the moment about 3 atmospheres
-        self.P=4*(10**5)
-        # Pressure of the atmosphere currently at an altitude of 0m above sea level
-        self.Patm=101325
-        # Volume of bottle (litres)
-        self.V=2*(10**-3) 
-        # Density of liquid
-        # Currently water
-        self.rho=1
-        #The total mass of the rocket when empty
-        self.mass_rocket=10
+def Radius(height):
+    radius = 0.1
+    #our current assumption is a cylinder with a hole of radius 0.01m in the base
+    if height == 0:
+        radius = 0.01
         
-    def WDgasblast(self,f):
-        """
-        calculates the work done in the gas blast
-        """
-        #10**3 to convert units
-        part1=(self.P*self.V)/(-self.gamma+1)
-        part2=(1-f)**(-self.gamma+1)
-        part3=(self.P/self.Patm)**((1/self.gamma)-1)
-        part4=(part2*part3)-1
-        workdone=part1*part4
-        return workdone
+    return radius
+
+def Area(height):
+    area=pi*Radius(height)**2
+                  
+    return area
+
+def Volume(height):
+    volume=0
+    for i in range(int(height/delta)):
+        volume+=(Area(i*delta)*delta)
         
-    def workdone(self, f):
-        """
-        Calculates work done for various values of f
-        """
-        top = self.P * self.V*(((1-f)**self.gamma)-(1-f))
-        bottom = (-self.gamma+1)
-        workdone = top / bottom
-        workdone+=(self.WDgasblast(f))
-        return workdone
+    return volume
+
+
+# Ratio of specific heat transfer
+gamma=1.4
+# List of all times
+filling_fraction_list=[]
+# Function of all times
+workdone_list=[]
+# Pressure of air in bottle at the moment about 3 atmospheres
+P=4*(10**5)
+Patm=0.001
+height=0.3
+V= Volume(height)
+#density of the liquid
+rho=998
+
+#The total mass of the rocket when empty
+mass_rocket=10
     
-    def WDweightratio(self,f):
-        """
-        Calculate the work done per kilogram of mass
-        """
-        workdone = self.workdone(f)
-        #V*10**3 as converting back into litres from cubic metres as defined 
-        mass = (f * self.V*(10**3)*self.rho) + self.mass_rocket
-        WMR = workdone / mass
-        return WMR
+def WDgasblast(f):
+    """
+    calculates the work done in the gas blast
+    """
+    part1=(P*V)/(-gamma+1)
+    try:
+        part2 = (1-f)**(-gamma+1)
+    except:
+        part2 = 0.00001
+    part3=(P/Patm)**(1/gamma-1)
+    part4=(part2*part3)-1
+    workdone=part1*part4
+    return workdone
     
-    def findtotalWD(self):
-        """
-        Calculate the work done
-        """
-        #Calculate for variouis values of filling fractions
-        for i in range(1,1001): 
-            f = i*0.001 
-            x = self.workdone(f) 
-            self.filling_fraction_list.append(f) 
-            self.workdone_list.append(x) 
-        return self.filling_fraction_list, self.workdone_list
+def workdone(f):
+    """
+    Calculates work done for various values of f
+    """
+    top = P * V*(((1-f)**gamma)-(1-f))
+    bottom = (-gamma+1)
+    workdone = top / bottom
+    workdone+=(WDgasblast(f))
+    return workdone
+
+def WDweightratio(f):
+    """
+    Calculate the work done per kilogram of mass
+    """
     
-    def findtotalWDMR(self):
-        """
-        Calculate work done mass ratio
-        """
-        # Calculate for various values of filling fractions
-        for i in range(1,1001): 
-            f = i*0.001 
-            x = self.WDweightratio(f) 
-            self.filling_fraction_list.append(f) 
-            self.workdone_list.append(x) 
-        return self.filling_fraction_list, self.workdone_list
+    workd = workdone(f)
+    #V*10**3 as converting back into litres from cubic metres as defined 
+    mass = (f * V*(10**3)*rho) + mass_rocket
+    WMR = workd / mass
+    return WMR
+
+def findtotalWD():
+    """
+    Calculate the work done
+    """
+    #Calculate for variouis values of filling fractions
+    for i in range(1000): 
+        f = i*0.001 
+        x = workdone(f) 
+        filling_fraction_list.append(f) 
+        workdone_list.append(x) 
+    return filling_fraction_list, workdone_list
+
+def findtotalWDMR():
+    """
+    Calculate work done mass ratio
+    """
+    # Calculate for various values of filling fractions
+    filling_fraction_list=[]
+    workdone_list = []
+    for i in range(1000): 
+        f = i*0.001 
+        x = WDweightratio(f) 
+        filling_fraction_list.append(f) 
+        workdone_list.append(x) 
+    return filling_fraction_list, workdone_list
+
+def findtotaldensity_WDMR_FF():
+    """
+    finds the values for the 3d plot of the workdone-mass-ratio, Density, Filling Fraction
+    """
+    X = []
+    Y = []
+    Z = []
+    global rho
     
-    def graph_WDMR_FF(self):
-        x,y=self.findtotalWDMR()
-        plt.plot(x,y)
-        plt.ylabel("Work Done per Unit Mass (Joules per Kilogram)")
-        plt.xlabel("Filling Fraction")
-        plt.title("Work Done per Unit Mass Against Filling Fraction")
-        plt.show()
+    for i in range(1000):
+        den_list=[]
+        
+        rho = i
+        x , y = findtotalWDMR()
+        X.append(x[i])
+        Y.append(y[i])
+        for j in range(len(x)):
+            den_list.append(i)
+        Z.append(den_list)
     
-    def graph_WD_FF(self):
-        x,y=self.findtotalWD()
-        plt.plot(x,y)
-        plt.ylabel("Work Done (Joules)")
-        plt.xlabel("Filling Fraction")
-        plt.title("Work Done Against Filling Fraction")
-        plt.show()
+    X=np.array(X)
+    Y=np.array(Y)
+    Z=np.array(Z, float)
+
+    return(X , Z , Y)
+
+def findtotalden_WDMR():
+    global rho
+    den_list = []
+    workdone_list = []
+    
+    for i in range(1,1000):
+        rho = i
+        x , y = findtotalWDMR()
+        workdone_list.append(max(y))
+        
+    for i in range(len(workdone_list)):
+        den_list.append(i)
+        
+    return(den_list,workdone_list)
 
 
 
-calc=WDCalc()
+
+
+
+def graph_den_WDMR_FF():
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    X, Y, Z= findtotaldensity_WDMR_FF()
+    ax.plot_surface(X , Y , Z)
+    ax.set_xlabel('Filling Fraction')
+    ax.set_ylabel('Density')
+    ax.set_zlabel("Workdone per Unit Mass")
+    plt.title("Workdone per Unit Mass Against Filling Fraction Against Density")
+
+def graph_den_WDMR():
+    x , y = findtotalden_WDMR()
+    plt.plot(x,y)
+    plt.ylabel("Work Done per Unit Mass")
+    plt.xlabel("Density")
+    plt.title("Work Done per Unit Mass Against Density")
+    plt.show()
+    
+def graph_WDMR_FF():
+    x,y=findtotalWDMR()
+    plt.plot(x,y)
+    plt.ylabel("Work Done per Unit Mass")
+    plt.xlabel("Filling Fraction")
+    plt.title("Work Done per Unit Mass Against Filling Fraction")
+    plt.show()
+
+def graph_WD_FF():
+    x,y=findtotalWD()
+    plt.plot(x,y)
+    plt.ylabel("Work Done (Joules)")
+    plt.xlabel("Filling Fraction")
+    plt.title("Work Done Against Filling Fraction")
+    plt.show()
+    
+graph_den_WDMR()
