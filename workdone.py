@@ -170,6 +170,44 @@ def findtotalheight_density_WDMR():
     Z=np.array(Z, float)
     return X, Y, Z
 
+def findtotalheight_WDMR():
+    height_list = []
+    workdone_list = []
+    global height
+    global V
+
+    for i in range(10000):
+        height = i*0.001
+        V = Volume(height)
+        x,y = findtotalWDMR()
+        height_list.append(height)
+        workdone_list.append(max(y))
+    
+    return (height_list , workdone_list)
+
+def findtotal_height_WDMR_FF():
+    height_list = []
+    X = []
+    Y = []
+    Z = []
+    global height
+    global V
+    for i in range(1000):
+        height = i*0.1
+        V=Volume(height)
+        x,y = findtotalWDMR()
+        X.append(x)
+        Y.append(y)
+        for j in range(len(x)):
+            height_list.append(i)
+        Z.append(height_list)
+    X=np.array(X)
+    Y=np.array(Y)
+    Z=np.array(Z, float)
+    return X, Y, Z
+        
+    
+
 def graph_height_den_WDMR():
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -179,6 +217,24 @@ def graph_height_den_WDMR():
     ax.set_ylabel('Density')
     ax.set_zlabel("Workdone per Unit Mass")
     plt.title("Workdone per Unit Mass Against Height Against Density")
+
+def graph_height_WDMR_FF():
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    X, Y, Z= findtotal_height_WDMR_FF()
+    ax.plot_surface(X , Y , Z)
+    ax.set_xlabel('Height')
+    ax.set_ylabel('Filling Fraction')
+    ax.set_zlabel("Workdone per Unit Mass")
+    plt.title("Workdone per Unit Mass Against Height Against Density")
+
+def graph_height_WDMR():
+    x , y = findtotalheight_WDMR()
+    plt.plot(x,y)
+    plt.ylabel("Work Done per Unit Mass")
+    plt.xlabel("Height")
+    plt.title("Work Done per Unit Mass Against Height")
+    plt.show()
 
 def graph_den_WDMR_FF():
     fig = plt.figure()
@@ -213,5 +269,5 @@ def graph_WD_FF():
     plt.xlabel("Filling Fraction")
     plt.title("Work Done Against Filling Fraction")
     plt.show()
-    
-graph_height_den_WDMR()
+     
+graph_height_WDMR_FF()
