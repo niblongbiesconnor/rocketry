@@ -77,9 +77,8 @@ def WDweightratio(f):
     Calculate the work done per kilogram of mass
     """
     
-    workd = workdone(f)
-    #V*10**3 as converting back into litres from cubic metres as defined 
-    mass = (f * V*(10**3)*rho) + mass_rocket
+    workd = workdone(f) 
+    mass = (f * V * rho) + mass_rocket
     WMR = workd / mass
     return WMR
 
@@ -148,12 +147,38 @@ def findtotalden_WDMR():
     for i in range(len(workdone_list)):
         den_list.append(i)
         
-    return(den_list,workdone_list)
+    return den_list, workdone_list
 
+def findtotalheight_density_WDMR():
+    height_list = []
+    X = []
+    Y = []
+    Z = []
+    global height
+    global V
+    for i in range(1000):
+        height = i*0.1
+        V=Volume(height)
+        x,y = findtotalden_WDMR()
+        X.append(x)
+        Y.append(y)
+        for j in range(len(x)):
+            height_list.append(i)
+        Z.append(height_list)
+    X=np.array(X)
+    Y=np.array(Y)
+    Z=np.array(Z, float)
+    return X, Y, Z
 
-
-
-
+def graph_height_den_WDMR():
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    X, Y, Z= findtotalheight_density_WDMR()
+    ax.plot_surface(X , Y , Z)
+    ax.set_xlabel('Height')
+    ax.set_ylabel('Density')
+    ax.set_zlabel("Workdone per Unit Mass")
+    plt.title("Workdone per Unit Mass Against Height Against Density")
 
 def graph_den_WDMR_FF():
     fig = plt.figure()
@@ -189,4 +214,4 @@ def graph_WD_FF():
     plt.title("Work Done Against Filling Fraction")
     plt.show()
     
-graph_den_WDMR()
+graph_height_den_WDMR()
