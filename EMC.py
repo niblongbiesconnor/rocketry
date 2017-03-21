@@ -119,14 +119,10 @@ class liquid:
             """
             updates the velocity according to the equations 
             """
-            C=0.5*((Area(0)/Area(water.height))**2-1)
-            D=((rhino.volume-water.initial_volume)/(rhino.volume-water.volume))**gamma
-            E=rhino.mass*(rhino.acceleration+9.81)/water.density*Area(0)*water.height
-            F=(D*water.initial_pressure/water.density) + (rhino.acceleration+9.81)*water.height
-            G=C/B(water.height)
-            I=(1+Area(0)/Area(water.height))/water.height
-            velocity=sqrt(abs((E+F)/(G+I)))
-            liq_vel.append(velocity)
+            part1=water.density*water.height*(9.81-rhino.acceleration)
+            part2=(1-(Area(0)/Area(water.height))**2)
+            velocity=sqrt(abs(water.pressure+part1/part2))
+            
             return velocity
         
         def pressure_update():
@@ -143,13 +139,12 @@ class liquid:
           
         #mundane updating of the variables
         self.velocity = velocity_update()
-        self.acceleration = self.velocity*delta
-        volume_lost = self.velocity*Area(0)*delta
+        height_lost =self.velocity*delta
+        volume_lost = height_lost*Area(0)
         self.volume -= volume_lost
-        self.flowrate = volume_lost*self.density/delta
-        rhino.mass -= volume_lost*self.density
-        self.height -= delta*self.velocity*Area(0)/Area(self.height)
+        self.height -= height_lost
         self.pressure = pressure_update()
+        liq_vel.append(self.velocity)
         liq_H.append(self.height)
 
 #initialisation of the classes
@@ -179,26 +174,27 @@ while rhino.height>0:
 
     
 def plotting():
-    plt.subplot(9,1,1)
+    plt.subplot(5,1,1)
     plt.plot(tt,acc)
     plt.title("Acceleration")
         
-    plt.subplot(9,1,3)
+    plt.subplot(5,1,3)
     plt.plot(tt,vel)
     plt.title("Velocity")
         
-    plt.subplot(9,1,5)
+    plt.subplot(5,1,5)
     plt.plot(tt,pos)
     plt.title("Altitude")
     
+    """
     plt.subplot(9,1,7)
     plt.plot(tt,liq_vel)
     plt.title("Liquid Velocity")
     
-    plt.subplot(9,1,9)
+    #plt.subplot(9,1,9)
     plt.plot(tt,liq_H)
     plt.title("Liquid Height")
-    
+    """
     plt.show
 
 plotting()

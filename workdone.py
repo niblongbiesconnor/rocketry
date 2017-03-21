@@ -6,7 +6,7 @@ Calculates the rocket's total work done
 from math import pi 
 import matplotlib.pyplot as plt
 import numpy as np
-from mpl_toolkits.mplot3d.axes3d import Axes3D
+#from mpl_toolkits.mplot3d.axes3d import Axes3D
 delta = 0.1
 gamma=1.4
 
@@ -205,6 +205,17 @@ def findtotal_height_WDMR_FF():
     Y=np.array(Y)
     Z=np.array(Z, float)
     return X, Y, Z
+
+def findtotalgamma_WDMR():
+    global gamma
+    gamma_list =[]
+    workdone_list = []
+    for i in range(101,1000):
+        gamma = i*0.01
+        gamma_list.append(gamma)
+        x , y = findtotalWDMR()
+        workdone_list.append(max(y))
+    return (gamma_list , workdone_list)
         
     
 
@@ -227,6 +238,14 @@ def graph_height_WDMR_FF():
     ax.set_ylabel('Filling Fraction')
     ax.set_zlabel("Workdone per Unit Mass")
     plt.title("Workdone per Unit Mass Against Height Against Density")
+
+def graph_gamma_WDMR():
+    x , y = findtotalgamma_WDMR()
+    plt.plot(x,y)
+    plt.ylabel("Work Done per Unit Mass")
+    plt.xlabel("Gamma")
+    plt.title("Work Done per Unit Mass Against Height")
+    plt.show()
 
 def graph_height_WDMR():
     x , y = findtotalheight_WDMR()
@@ -270,4 +289,4 @@ def graph_WD_FF():
     plt.title("Work Done Against Filling Fraction")
     plt.show()
      
-graph_height_WDMR_FF()
+graph_gamma_WDMR()
