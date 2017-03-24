@@ -47,15 +47,17 @@ class rocket():
     the rocket  contains most of the rocket based variables needs to be updated 
     """ 
     def __init__(self):
+        """
+        innitialisations of the rockets variables 
+        """
         #the bottles characterisitics and other constants
         self.mbottle = 0.1
-        self.bottle_length=11
-        self.volume=Volume(self.bottle_length)
+        self.bottle_length = 11
+        self.volume = Volume(self.bottle_length)
        
         
-        
         #the rockets variables
-        self.mass = self.mbottle+water.volume*water.density
+        self.mass = self.mbottle + (water.volume*water.density)
         self.initial_mass =  self.mass
         self.Force = 0
         self.velocity = 0
@@ -63,8 +65,24 @@ class rocket():
         self.height = 0
         
     def water_update(self):
+        """
+        updates the rockets position if there is still water within the rocket
+        """
         rhino.mass=rhino.mbottle+water.volume*water.density
         self.acceleration=water.velocity*log(self.initial_mass/(self.mbottle)*delta)
+        self.velocity+=self.acceleration*delta
+        self.height+=self.velocity*delta
+        
+        if self.height <= 0:
+            self.height = 0
+            self.velocity = 0
+            self.acceleration = 0
+        acc.append(self.acceleration)
+        vel.append(self.velocity)
+        pos.append(self.height)
+    
+    def gas_update():
+        self.acceleration=water.air_velocity*log(self.initial_mass/(self.mbottle)*delta)
         self.velocity+=self.acceleration*delta
         self.height+=self.velocity*delta
         
@@ -111,6 +129,7 @@ class liquid:
        self.initial_height = self.height
        self.volume = Volume(self.height)
        self.initial_volume = self.volume
+       self.gas_velocity = ()
 
         
     def water_update(self):
@@ -155,18 +174,22 @@ rhino=rocket()
 
 #the main part of the program
 rec=0
-while water.height>0.1:
-    water.water_update()
-    rhino.water_update()
-    rec+=1
-    tt.append(rec*delta)
+def water_phase():
+    global rec
+    while water.height>0.1:
+        water.water_update()
+        rhino.water_update()
+        rec+=1
+        tt.append(rec*delta)
 
-while rhino.height>0:
-    rhino.fall()
-    rec+=1
-    liq_vel.append(0)
-    liq_H.append(0)
-    tt.append(rec*delta)
+def fall_phase():
+    global rec
+    while rhino.height>0:
+        rhino.fall()
+        rec+=1
+        liq_vel.append(0)
+        liq_H.append(0)
+        tt.append(rec*delta)
 
     
 
@@ -191,10 +214,18 @@ def plotting():
     plt.plot(tt,liq_vel)
     plt.title("Liquid Velocity")
     
-    #plt.subplot(9,1,9)
+    plt.subplot(9,1,9)
     plt.plot(tt,liq_H)
     plt.title("Liquid Height")
-    """
     plt.show
+    """
 
-plotting()
+def main():
+    water_phase()
+    rhino.mass = rhino.mbottle
+    fall_phase()
+    plotting()
+    
+
+if __name__ == "__main__": 
+     main()
