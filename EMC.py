@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Mar 26 17:09:49 2017
-
 @author: user
 """
 #my imported 
@@ -48,7 +47,7 @@ class rocket():
         """
         #the bottles characterisitics and other constants
         self.mbottle = 0.048
-        self.bottle_length = 10
+        self.bottle_length = 4
         self.volume = Volume(self.bottle_length)
        
         
@@ -81,6 +80,8 @@ class rocket():
         
         rhino.mass = rhino.mbottle + (water.volume * water.density)
         #self.acceleration = water.velocity * log(self.initial_mass / self.mbottle)
+        if self.mass<self.mbottle:
+            self.mass = self.mbottle
         self.acceleration = (water.volume_lost*water.density)*water.velocity/(rhino.mass*delta)
         self.acceleration -= 9.81
         self.velocity += self.acceleration * delta
@@ -119,10 +120,10 @@ class liquid:
        self.acceleration = 0
        self.velocity = 0
        self.flowrate = 0
-       self.pressure = 12960000
+       self.pressure = 1296000
        self.initial_pressure = self.pressure
        self.density = 998
-       self.height = 2.2
+       self.height = 1.3
        self.initial_height = self.height
        self.volume = Volume(self.height)
        self.initial_volume = self.volume
@@ -284,10 +285,10 @@ def plotting():
     plt.title("Altitude")
     
     """
-    plt.subplot(7,1,7)
+    plt.subplot(9,1,7)
     plt.plot(tt,liq_vel)
     plt.title("Liquid Velocity")
-
+    
     plt.subplot(9,1,9)
     plt.plot(tt,liq_H)
     plt.title("Liquid Height")
